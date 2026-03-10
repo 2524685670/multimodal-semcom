@@ -1,0 +1,85 @@
+# ===== 数据 =====
+data:
+  dataset: "flickr30k"
+  data_root: "./data/flickr30k"
+  train_size: 5000
+  val_size: 500
+  image_size: 224
+  num_workers: 4
+  max_text_length: 77
+
+# ===== 模型 =====
+model:
+  clip_model: "openai/clip-vit-base-patch32"
+  visual_hidden_dim: 768      # CLIP ViT-B/32 视觉隐藏维度
+  text_hidden_dim: 512        # CLIP 文本隐藏维度
+  proj_dim: 512               # 公共投影空间维度
+  num_visual_units: 16
+  num_text_units: 16
+  unit_dim: 512               # 语义单元内部维度
+  num_attention_layers: 2     # CrossAttention 层数
+  num_attention_heads: 8
+
+# ===== RVQ (阶段二用，此处预留) =====
+rvq:
+  num_stages: 4
+  codebook_size: 256
+  commitment_weight: 1.0
+  decay: 0.99
+
+# ===== 重要度 (阶段二用) =====
+importance:
+  num_perturbations: 4
+  top_k_candidates: 16
+  high_threshold: 0.7
+  low_threshold: 0.3
+
+# ===== 信道 (阶段三用) =====
+channel:
+  packet_loss_rate: 0.2
+  stage1_loss_rate: 0.05
+  stage2_loss_rate: 0.10
+  stage3_loss_rate: 0.25
+  stage4_loss_rate: 0.35
+
+# ===== 传输策略 (阶段三用) =====
+transmission:
+  high_stages: [1, 2, 3, 4]
+  medium_stages: [1, 2]
+  low_stages: [1]
+
+# ===== 纠错 (阶段三用) =====
+correction:
+  trigger_missing_threshold: 2
+  similarity_threshold: 0.6
+  max_retransmissions: 1
+  top_k_correction: 3
+
+# ===== 训练 =====
+training:
+  stage1:
+    epochs: 30
+    batch_size: 64
+    lr: 1.0e-4
+    weight_decay: 1.0e-5
+    warmup_steps: 200
+    loss_weights:
+      global_align: 1.0
+      unit_align: 0.5
+      diversity: 0.1
+  stage2:
+    epochs: 20
+    batch_size: 32
+    lr: 5.0e-5
+    rvq_epochs: 10
+    importance_samples: 5000
+  stage3:
+    epochs: 10
+    batch_size: 32
+    lr: 1.0e-5
+
+# ===== 输出 =====
+output:
+  checkpoint_dir: "./checkpoints"
+  log_dir: "./logs"
+  result_dir: "./results"
