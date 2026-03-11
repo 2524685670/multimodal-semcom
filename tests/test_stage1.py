@@ -12,6 +12,7 @@
 """
 
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import sys
 import argparse
 import yaml
@@ -74,8 +75,9 @@ def test_forward(config: dict, device: torch.device):
 
     # 构造小 batch
     dataset = DummyDataset(size=B, image_size=config["data"]["image_size"])
-    batch = {k: v.to(device) if isinstance(v, torch.Tensor) else v
-             for k, v in [dataset[i] for i in range(B)].__class__.__mro__[0]}
+    images = torch.stack([dataset[i]["image"] for i in range(B)]).to(device)
+    text_ids = torch.stack([dataset[i]["text_input_ids"] for i in range(B)]).to(device)
+    text_mask = torch.stack([dataset[i]["text_attention_mask"] for i in range(B)]).to(device)
 
     # 手动构造 batch (因为 DummyDataset 返回单样本)
     images = torch.stack([dataset[i]["image"] for i in range(B)]).to(device)

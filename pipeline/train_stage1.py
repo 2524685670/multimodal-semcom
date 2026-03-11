@@ -9,6 +9,7 @@ CLIPFeatureExtractor 全程冻结
 """
 
 import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import sys
 import argparse
 import yaml

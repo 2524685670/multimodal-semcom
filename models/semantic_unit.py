@@ -64,6 +64,10 @@ class CrossAttentionBlock(nn.Module):
         # key_padding_mask 要求: True = 被忽略的位置
         key_padding_mask = None
         if kv_mask is not None:
+            # MultiheadAttention 要求 key_padding_mask 为 bool 或 float
+            # 约定 kv_mask: True=有效token, False=padding
+            if kv_mask.dtype != torch.bool:
+                kv_mask = kv_mask > 0
             key_padding_mask = ~kv_mask  # 反转：True 表示需要 mask 掉
 
         # Cross-Attention
