@@ -1,7 +1,7 @@
 # ===== 数据 =====
 data:
   dataset: "flickr30k"
-  data_root: "./data/flickr30k"
+  data_root: "/root/autodl-tmp/flickr30k"
   train_size: 5000
   val_size: 500
   image_size: 224
